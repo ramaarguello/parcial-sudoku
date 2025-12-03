@@ -5,6 +5,20 @@ fondo = pygame.transform.scale(fondo, (800, 600))
 
 
 def cargar_puntajes():
+
+    """
+    DESCRIPCION:
+        Lee el archivo 'puntajes.txt' y carga todos los puntajes guardados.
+        Cada línea del archivo debe tener el formato: 'nombre : puntaje'.
+        Convierte los puntajes en enteros y los devuelve como una lista.
+
+    RETORNA:
+        puntajes (list[tuple[str, int]]):
+            Lista de tuplas donde cada elemento contiene:
+            - nombre (str)
+            - puntaje (int)
+    """
+
     puntajes = []
 
     with open("puntajes.txt", "r", encoding="utf-8") as archivo:
@@ -17,12 +31,46 @@ def cargar_puntajes():
     return puntajes
 
 def mejores_cinco(puntajes):
-    # Ordenar de mayor a menor según el puntaje
+    
+    """
+    DESCRIPCION:
+        Recibe una lista de puntajes y devuelve únicamente los cinco mejores.
+        Los puntajes se ordenan de mayor a menor según el valor numérico.
+
+    PARAMETROS:
+        puntajes (list[tuple[str, int]]):
+            Lista de tuplas con (nombre, puntaje).
+
+    RETORNA:
+        list[tuple[str, int]]:
+            Lista con los cinco puntajes más altos.
+            Si hay menos de cinco, devuelve todos los disponibles.
+    """
+
     puntajes_ordenados = sorted(puntajes, key=lambda x: x[1], reverse=True)
     return puntajes_ordenados[:5]
 
 def mostrar_puntajes(pantalla):
-    # Cargar el mismo fondo del juego
+    
+    """
+    DESCRIPCION:
+        Despliega una pantalla que muestra los mejores 5 puntajes guardados.
+        Muestra:
+            - Fondo del juego
+            - Título "Mejores 5 puntajes"
+            - Lista de nombres y puntajes
+            - Botón "Volver" para regresar al menú principal
+
+        Esta función mantiene su propio loop hasta que se hace clic en VOLVER.
+
+    PARAMETROS:
+        pantalla (pygame.Surface):
+            Superficie principal donde se dibuja la interfaz.
+
+    RETORNA:
+        Nada. La función finaliza cuando el usuario presiona "Volver".
+    """
+
     fondo = pygame.image.load("fondo.sudoku.jpg")
     fondo = pygame.transform.scale(fondo, (800, 600))
 
@@ -69,8 +117,32 @@ def mostrar_puntajes(pantalla):
 
         pygame.display.update()
 
-
 def mostrar_inicio():
+
+    """
+    DESCRIPCION:
+        Muestra la pantalla de inicio del juego.
+        Contiene los botones:
+            - Nivel (cambia entre Fácil / Medio / Difícil)
+            - Jugar (entra al tablero)
+            - Ver Puntajes (abre pantalla de puntajes)
+            - Salir (cierra el juego)
+
+        Esta función mantiene un loop hasta que el usuario elige
+        "Jugar" o "Salir".
+
+    PARAMETROS:
+        Ninguno.
+
+    RETORNA:
+        tuple (accion, nivel):
+            accion (str):
+                "Jugar" → inicia el sudoku
+                "Salir" → cierra la aplicación
+            nivel (str):
+                "Fácil", "Medio" o "Difícil"
+    """
+
     pantalla = pygame.display.set_mode((800,600))
     pygame.display.set_caption("Sudoku")
 

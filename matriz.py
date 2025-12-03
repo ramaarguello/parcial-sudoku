@@ -344,7 +344,7 @@ def actualizar_puntaje(puntaje, matriz, fila, columna, numero, celda_incorrecta)
             puntaje += 81
     else:
         if not celda_incorrecta:
-            puntaje -= 1
+            pass
     return puntaje
 
 def actualizar_puntaje_regiones(matriz, regiones_completadas, puntaje):

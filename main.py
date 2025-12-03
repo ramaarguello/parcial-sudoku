@@ -181,7 +181,7 @@ def dibujar_seleccion(pantalla, celda):
         
         pygame.draw.rect(pantalla, color, (175 + col*50, 75 + fila*50, 50, 50), 3)
 
-def dibujar_botones(pantalla):
+def dibujar_botones(pantalla, sudoku_listo):
     """
     DESCRIPCION:
         Dibuja los botones que existen en el dict global botones.
@@ -197,6 +197,10 @@ def dibujar_botones(pantalla):
     NEGRO = (0,0,0)
 
     for texto, rect in botones.items():
+
+        if texto == "Terminar" and not sudoku_listo:
+            continue
+
         pygame.draw.rect(pantalla, BLANCO, rect)
         texto_render = fuente.render(texto, True, NEGRO)
         pantalla.blit(texto_render, (rect.x + 20, rect.y + 10))
@@ -258,6 +262,7 @@ botones = {
     "Validar": pygame.Rect(500, 540, 230, 50),
     "Reiniciar": pygame.Rect(70, 540, 230, 50),
     "Terminar": pygame.Rect(500, 10, 230, 50),
+    "Volver": pygame.Rect(200, 10, 230, 50)
 }
 
 celda_incorrecta = False
@@ -340,6 +345,29 @@ while True:
                 matriz = [fila.copy() for fila in tablero_inicial] 
                 puntaje = 0
                 celda_seleccionada = None
+            if botones["Volver"].collidepoint(mouseX, mouseY):
+                accion, nivel = mostrar_inicio()
+    
+                if accion == "Salir":
+                    pygame.quit()
+                    quit()
+
+                # Si vuelve a "Jugar", regenerar tablero con la dificultad elegida
+                if nivel == "Fácil":
+                    numeros_por_region = 5
+                elif nivel == "Medio":
+                    numeros_por_region = 4
+                else:
+                    numeros_por_region = 3
+
+                tablero_inicial = generar_tablero_facil_por_region(numeros_por_region)
+                matriz = [fila.copy() for fila in tablero_inicial]
+                puntaje = 0
+                celda_seleccionada = None
+                errores_celdas = [[False]*9 for _ in range(9)]
+                regiones_completadas = [[False]*3 for _ in range(3)]
+
+
 
         elif evento.type == pygame.KEYDOWN and celda_seleccionada:
             fila, col = celda_seleccionada
@@ -366,7 +394,16 @@ while True:
     dibujar_tablero(dimension_pantalla)
     dibujar_numeros(dimension_pantalla, matriz)
     dibujar_seleccion(dimension_pantalla, celda_seleccionada)
-    dibujar_botones(dimension_pantalla)
+    
+    sudoku_listo = True
+    for fila in range(9):
+        for col in range(9):
+            if matriz[fila][col] == 0:
+                sudoku_listo = False
+            if errores_celdas[fila][col]:
+                sudoku_listo = False
+
+    dibujar_botones(dimension_pantalla, sudoku_listo)
     dibujar_puntaje(dimension_pantalla, puntaje)
 
     pygame.display.update()
