@@ -114,33 +114,6 @@ def validar_numero(matriz, fila, columna, numero): #validamos el numero
     matriz[fila][columna] = valor_anterior
     return fila_ok and columna_ok and region_ok #retorna el numero si es que pasa todos los chequeos
 
-def encontrar_vacio(matriz): #busca la siguiente celda vacia para ingresar otro numero (donde)
-    """
-    DESCRIPCION:
-        Busca la primera celda que contenga un 0 (vacía).
-    
-    RETORNA:
-        (fila, columna) si encuentra una celda vacía.
-        None si no hay más celdas vacías.
-    """    
-    for i in range(9):
-        for j in range(9):
-            if matriz[i][j] == 0:
-                return i, j
-    return None
-
-def generar_tablero_completo():
-    """
-    DESCRIPCION:
-        Genera un Sudoku completamente resuelto utilizando backtracking aleatorio.
-    
-    RETORNA:
-        Una matriz 9x9 válida y completa.
-    """
-    matriz = [[0]*9 for _ in range(9)]
-    resolver_sudoku_aleatorio(matriz)
-    return matriz
-
 def region_completa(matriz, fila, columna):
     """
     DESCRIPCION:
@@ -157,60 +130,6 @@ def region_completa(matriz, fila, columna):
             if matriz[fila_vertice + i][columna_vertice + j] == 0:
                 return False
     return True
-
-def resolver_sudoku_aleatorio(matriz): #Llena el tablero para lograr encontrar una solucion valida 
-    """
-    DESCRIPCION:
-        Resuelve un Sudoku incompleto de forma aleatoria mediante backtracking, generando soluciones distintas cada vez.
-    
-    RETORNA:
-        True si encontró una solución válida.
-        False si debe retroceder y probar otra combinación.
-    """
-    pos = encontrar_vacio(matriz) 
-    if pos is None: #sino hay celdas vacias retorna True
-        return True
-    fila, col = pos
-    numeros = list(range(1, 10))
-    random.shuffle(numeros)
-    for numero in numeros: #recorre los numeros aletarios
-        if validar_numero(matriz, fila, col, numero): 
-            matriz[fila][col] = numero
-            if resolver_sudoku_aleatorio(matriz):
-                return True
-            matriz[fila][col] = 0
-    return False #esto permite probar otras combinaciones
-
-def resolver_sudoku_conteo(matriz, limite=2): #Verificamos que tenga al menos dos soluciones 
-    """
-    DESCRIPCION:
-        Cuenta cuántas soluciones tiene un tablero.
-        Se usa para validar que un Sudoku tenga solución única.
-
-    PARAMETROS:
-        matriz: tablero actual.
-        limite (int): máximo de soluciones antes de detenerse.
-    
-    RETORNA:
-        Número de soluciones encontradas (entre 0 y limite).
-    """
-    vacio = encontrar_vacio(matriz)
-    if not vacio:
-        return 1  # encontró una solución
-
-    fila, col = vacio
-    soluciones = 0
-
-    for num in range(1, 10):
-        if validar_numero(matriz, fila, col, num): #Intentamos cada número posible en la celda vacía, validando fila, columna y región
-            matriz[fila][col] = num
-            soluciones += resolver_sudoku_conteo(matriz, limite) 
-            if soluciones >= limite:
-                break
-
-            matriz[fila][col] = 0
-
-    return soluciones
 
 def tablero_completo(matriz):
     """
@@ -259,45 +178,6 @@ def generar_tablero_facil_por_region(numeros_por_region): #genera los numeros po
                 else:
                     intentos += 1
     return matriz
-
-def crear_sudoku_con_pistas(tablero_completo, pistas_por_region=5):
-    """
-    DESCRIPCION:
-        Toma un Sudoku ya resuelto y elimina números manteniendo solución única.
-
-    PARAMETROS:
-        tablero_completo: matriz resuelta.
-        pistas_por_region: dificultad del juego.
-
-    RETORNA:
-        Un Sudoku jugable.
-    """
-    sudoku = [fila[:] for fila in tablero_completo] #hace una copia del tablero completo para no modificar el original
-
-    # posiciones del tablero mezcladas
-    posiciones = [(fila, col) for fila in range(9) for col in range(9)]
-    random.shuffle(posiciones)
-
-    for fila, col in posiciones:
-        if sudoku[fila][col] == 0:
-            continue
-
-        valor_original = sudoku[fila][col]
-        sudoku[fila][col] = 0
-
-        copia = [fila[:] for fila in sudoku]
-        soluciones = resolver_sudoku_conteo(copia)
-
-        # si el sudoku ahora no tiene solución única → revertimos
-        if soluciones != 1:
-            sudoku[fila][col] = valor_original
-
-        # limitar cantidad mínima de pistas
-        pistas_totales = sum(1 for v in sum(sudoku, []) if v != 0)
-        if pistas_totales <= pistas_por_region * 9:
-            break
-
-    return sudoku #Devuelve el Sudoku jugable con las pistas finales
 
 def region_correcta(matriz, region_f, region_c):
     """
